@@ -1,0 +1,46 @@
+{
+	"name": "nativescript-collapsing-header",
+	"version": "0.0.1",
+	"description": "NativeScript Collapsing Header Plugin.",
+	"main": "nativescript-collapsing-header.js",
+	"nativescript": {
+		"platforms": {
+			"android": "1.7.0",
+			"ios": "1.7.0"
+		},
+		"tns-ios": {
+			"version": "1.7.0"
+		}
+	},
+	"scripts": {
+		"build": "tsc",
+		"demo.ios": "npm run preparedemo &&  cd demo &&  tns run ios",
+		"demo.android": "npm run preparedemo &&  cd demo &&  tns run android",
+		"preparedemo": "npm run build &&  cd demo &&  tns plugin remove nativescript-collapsing-header &&  tns plugin add .. &&  tns install",
+		"setup": "cd demo &&  npm install &&  cd .. &&  npm run build &&  cd demo &&  tns plugin add .. &&  cd .."
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/TheOriginalJosh/nativescript-collapsing-header.git"
+	},
+	"keywords": [
+		"NativeScript",
+		"JavaScript",
+		"Android",
+		"iOS",
+		"Collapsing Header"
+	],
+	"author": {
+		"name": "Josh Sommer",
+		"email": "joshdsommer@gmail.com"
+	},
+	"bugs": {
+		"url": "https://github.com/TheOriginalJosh/nativescript-collapsing-header/issues"
+	},
+	"license": "MIT",
+	"homepage": "https://github.com/TheOriginalJosh/nativescript-collapsing-header",
+	"readmeFilename": "README.md",
+	"devDependencies": {
+		"typescript": "^1.8.9"
+	}
+}

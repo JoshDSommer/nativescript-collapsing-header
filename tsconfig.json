@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "removeComments": true,
+        "experimentalDecorators": true,
+        "sourceMap": true,
+        "declaration": true
+    },
+    "files": [
+      "demo/node_modules/tns-core-modules/tns-core-modules.d.ts",
+      "nativescript-collapsing-header.ts"
+    ],
+    "compileOnSave": false
+}
