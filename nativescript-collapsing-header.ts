@@ -10,6 +10,7 @@ import {Color} from 'color';
 
 export class Header extends StackLayout {
 	private _dropShadow: boolean;
+
 	get dropShadow(): boolean {
 		return this._dropShadow;
 	}
@@ -37,7 +38,15 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 	private _topOpacity: number;
 	private _loaded: boolean;
 	private _minimumHeights: IMinimumHeights;
+	private _statusBarBackgroundColor: string;
 
+	get statusIosBarBackgroundColor(): string{
+		return this._statusBarBackgroundColor;
+	}
+
+	set statusIosBarBackgroundColor(color: string) {
+		this._statusBarBackgroundColor = color;
+	}
 
 	get android(): any {
 		return;
@@ -49,6 +58,10 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 
 	constructor() {
 		super();
+		this.constructView();
+	}
+
+	private constructView(): void {
 		this._childLayouts = [];
 		let contentView: Content;
 		let scrollView: ScrollView = new ScrollView();
@@ -56,11 +69,14 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 		let maxTopViewHeight: number;
 		let controlsToFade: string[];
 		let headerView: AbsoluteLayout = new AbsoluteLayout();
-		let row = new ItemSpec(2, GridUnitType.star);
+		let statusBarBackground: AbsoluteLayout = new AbsoluteLayout();
+		let row = new ItemSpec(3, GridUnitType.star);
 		let column = new ItemSpec(1, GridUnitType.star);
 		let invalidSetup = false;
 		this._minimumHeights = this.getMinimumHeights();
-
+		if (this.statusIosBarBackgroundColor == null) {
+			this.statusIosBarBackgroundColor = '#fff';
+		}
 		//must set the vertical alignmnet or else there is issues with margin-top of 0 being the middle of the screen.
 		this.verticalAlignment = 'top';
 		scrollView.verticalAlignment = 'top';
@@ -72,27 +88,28 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 			//prevents re adding views on resume in android.
 			if (!this._loaded) {
 				this._loaded = true;
-
 				this.addRow(row);
 				this.addColumn(column);
 				this.addChild(scrollView);
 				this.addChild(headerView);
+				this.addChild(statusBarBackground);
 
-				GridLayout.setRow(scrollView, 1);
-				GridLayout.setRow(headerView, 0);
-				GridLayout.setColumn(scrollView, 1);
-				GridLayout.setColumn(headerView, 0);
+				GridLayout.setRow(scrollView, 2);
+				GridLayout.setRow(headerView, 1);
+				GridLayout.setRow(statusBarBackground, 0);
+				GridLayout.setColumn(scrollView, 2);
+				GridLayout.setColumn(headerView, 1);
+				GridLayout.setColumn(statusBarBackground, 0);
 
+				statusBarBackground.height = 25;
+				statusBarBackground.width = this._minimumHeights.portrait;
+				statusBarBackground.backgroundColor = new Color(this.statusIosBarBackgroundColor);
+				statusBarBackground.verticalAlignment = 'top';
+				statusBarBackground.marginTop = -25;
 				//creates a new stack layout to wrap the content inside of the plugin.
 				let wrapperStackLayout = new StackLayout();
 				scrollView.content = wrapperStackLayout;
-
-				//no ui bounce. causes problems
-				if (app.ios) {
-					scrollView.ios.bounces = false;
-				} else if (app.android) {
-					scrollView.android.setOverScrollMode(2);
-				}
+				this.disableBounce(scrollView);
 
 				this._childLayouts.forEach(element => {
 					if (element instanceof Content) {
@@ -113,59 +130,79 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 					}
 				});
 
-				if (headerView == null || contentView == null) {
-					this.displayDevWarning('ScrollView Setup Invalid. You must have Header and Content tags',
-						headerView,
-						contentView, contentView);
-					return;
-				}
-				if (isNaN(headerView.height)) {
-					this.displayDevWarning('Header MUST have a height set.',
-						headerView, contentView);
-					return;
-				}
+				this.validateView(headerView, contentView);
 
 				headerView.marginTop = 0;
 				wrapperStackLayout.paddingTop = headerView.height;
 				wrapperStackLayout.marginTop = 0;
 
-				let prevOffset = -10;
-				let baseOffset = 0;
-				scrollView.on(ScrollView.scrollEvent, (args: ScrollEventData) => {
-					//leaving in the up/down detection as it may be handy in the future.
-					if (prevOffset <= scrollView.verticalOffset) {
-						//when scrolling down
-						if (baseOffset > scrollView.verticalOffset) {
-							baseOffset = scrollView.verticalOffset;
-						}
-						headerView.marginTop = baseOffset - scrollView.verticalOffset;
-						if (headerView.marginTop < (headerView.height * -1)) {
-							headerView.marginTop = (headerView.height * -1);
-						}
-					} else {
-						//scrolling up,
-						if (baseOffset < scrollView.verticalOffset) {
-							baseOffset = scrollView.verticalOffset;
-						}
-						headerView.marginTop = headerView.marginTop + 3;
-						if (headerView.marginTop > 0) {
-							headerView.marginTop = 0;
-						}
-					}
-					//this accounts for a fast scroll that reaches the top with the header partially shown.
-					if (scrollView.verticalOffset === 0) {
-						headerView.marginTop = 0;
-					}
-					prevOffset = scrollView.verticalOffset;
-				});
+				this.addScrollEvent(scrollView, headerView);
+
 			}
 		});
 	}
-	setMinimumHeight(contentView: Content, anchoredRow: AbsoluteLayout, minHeight: number): void {
+
+	public disableBounce(scrollView: ScrollView): void {
+		//no ui bounce. causes problems
+		if (app.ios) {
+			scrollView.ios.bounces = false;
+		} else if (app.android) {
+			scrollView.android.setOverScrollMode(2);
+		}
+
+	}
+
+	public validateView(headerView: AbsoluteLayout, contentView: Content): void {
+		if (headerView == null || contentView == null) {
+			this.displayDevWarning('ScrollView Setup Invalid. You must have Header and Content tags',
+				headerView,
+				contentView, contentView);
+			return;
+		}
+		if (isNaN(headerView.height)) {
+			this.displayDevWarning('Header MUST have a height set.',
+				headerView, contentView);
+			return;
+		}
+	}
+
+	public addScrollEvent(scrollView: ScrollView, headerView: AbsoluteLayout) {
+		let prevOffset = -10;
+		let baseOffset = 0;
+		scrollView.on(ScrollView.scrollEvent, (args: ScrollEventData) => {
+			//leaving in the up/down detection as it may be handy in the future.
+			if (prevOffset <= scrollView.verticalOffset) {
+				//when scrolling down
+				if (baseOffset > scrollView.verticalOffset) {
+					baseOffset = scrollView.verticalOffset;
+				}
+				headerView.marginTop = baseOffset - scrollView.verticalOffset;
+				if (headerView.marginTop < (headerView.height * -1)) {
+					headerView.marginTop = (headerView.height * -1);
+				}
+			} else {
+				//scrolling up,
+				if (baseOffset < scrollView.verticalOffset) {
+					baseOffset = scrollView.verticalOffset;
+				}
+				headerView.marginTop = headerView.marginTop + 3;
+				if (headerView.marginTop > 0) {
+					headerView.marginTop = 0;
+				}
+			}
+			//this accounts for a fast scroll that reaches the top with the header partially shown.
+			if (scrollView.verticalOffset === 0) {
+				headerView.marginTop = 0;
+			}
+			prevOffset = scrollView.verticalOffset;
+		});
+	}
+
+	public setMinimumHeight(contentView: Content, minHeight: number): void {
 		contentView.minHeight = minHeight;
 	}
 
-	getMinimumHeights(): IMinimumHeights {
+	public getMinimumHeights(): IMinimumHeights {
 		let height1 = Platform.screen.mainScreen.heightDIPs;
 		let height2 = Platform.screen.mainScreen.widthDIPs;
 		//if the first hieght is lager than the second hiehgt it's the portrait views min hieght.
@@ -182,7 +219,7 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 		}
 	}
 
-	addDropShadow(marginTop: number, width: number): StackLayout {
+	public addDropShadow(marginTop: number, width: number): StackLayout {
 		let wrapper = new StackLayout();
 		wrapper.width = width;
 		wrapper.height = 3;
@@ -193,7 +230,7 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 		return wrapper;
 	}
 
-	shadowView(opacity: number, width: number): StackLayout {
+	private shadowView(opacity: number, width: number): StackLayout {
 		let shadowRow = new StackLayout();
 		shadowRow.backgroundColor = new Color('black');
 		shadowRow.opacity = opacity;
@@ -201,7 +238,7 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 		return shadowRow;
 	}
 
-	displayDevWarning(message: string, ...viewsToCollapse: View[]): void {
+	public displayDevWarning(message: string, ...viewsToCollapse: View[]): void {
 		let warningText = new Label();
 		warningText.text = message;
 		warningText.color = new Color('red');
