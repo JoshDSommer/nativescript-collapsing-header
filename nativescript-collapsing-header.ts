@@ -33,20 +33,11 @@ export interface IMinimumHeights {
 }
 
 export class CollapsingHeader extends GridLayout implements AddChildFromBuilder {
-	private _controlsToFade: string;
 	private _childLayouts: View[];
-	private _includesAnchored: boolean;
 	private _topOpacity: number;
 	private _loaded: boolean;
 	private _minimumHeights: IMinimumHeights;
 
-	get controlsToFade(): string {
-		return this._controlsToFade;
-	}
-
-	set controlsToFade(value: string) {
-		this._controlsToFade = value;
-	}
 
 	get android(): any {
 		return;
@@ -74,7 +65,6 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 		this.verticalAlignment = 'top';
 		scrollView.verticalAlignment = 'top';
 		headerView.verticalAlignment = 'top';
-		this._includesAnchored = false;
 		this._topOpacity = 1;
 		this._loaded = false;
 
@@ -120,7 +110,6 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 							headerView.height = element.height;
 						}
 						element.verticalAlignment = 'top';
-						this._includesAnchored = true;
 					}
 				});
 
@@ -173,9 +162,6 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 		});
 	}
 	setMinimumHeight(contentView: Content, anchoredRow: AbsoluteLayout, minHeight: number): void {
-		if (this._includesAnchored) {
-			minHeight = minHeight - (anchoredRow.height * 0.9); //0.9 is to give it a little bit extra space.
-		}
 		contentView.minHeight = minHeight;
 	}
 
