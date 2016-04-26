@@ -1,8 +1,9 @@
-import { ScrollView } from 'ui/scroll-view';
 import { GridLayout } from 'ui/layouts/grid-layout';
-import { AbsoluteLayout } from 'ui/layouts/absolute-layout';
-import { View } from 'ui/core/view';
+import { AddChildFromBuilder } from 'ui/core/view';
 import { StackLayout } from 'ui/layouts/stack-layout';
+import { CollapsingHeaderUtilities } from './collapsing-header-utilities';
+export declare class Utilities extends CollapsingHeaderUtilities {
+}
 export declare class Header extends StackLayout {
     private _dropShadow;
     dropShadow: boolean;
@@ -14,7 +15,7 @@ export interface IMinimumHeights {
     portrait: number;
     landscape: number;
 }
-export declare class CollapsingHeader extends GridLayout {
+export declare class CollapsingHeader extends GridLayout implements AddChildFromBuilder {
     header: Header;
     content: Content;
     private _childLayouts;
@@ -27,12 +28,5 @@ export declare class CollapsingHeader extends GridLayout {
     ios: any;
     constructor();
     private constructView();
-    disableBounce(scrollView: ScrollView): void;
-    validateView(headerView: AbsoluteLayout, contentView: Content): void;
-    addScrollEvent(scrollView: ScrollView, headerView: AbsoluteLayout): void;
-    setMinimumHeight(contentView: Content, minHeight: number): void;
-    getMinimumHeights(): IMinimumHeights;
-    addDropShadow(marginTop: number, width: number): StackLayout;
-    private shadowView(opacity, width);
-    displayDevWarning(message: string, ...viewsToCollapse: View[]): void;
+    _addChildFromBuilder: (name: string, value: any) => void;
 }
