@@ -3,7 +3,7 @@ import * as Platform from 'platform';
 import {ScrollView, ScrollEventData} from 'ui/scroll-view';
 import {GridLayout, ItemSpec, GridUnitType} from 'ui/layouts/grid-layout';
 import {AbsoluteLayout} from 'ui/layouts/absolute-layout';
-import {View, AddChildFromBuilder} from 'ui/core/view';
+import {View} from 'ui/core/view';
 import {Label} from 'ui/label';
 import {StackLayout} from 'ui/layouts/stack-layout';
 import {Color} from 'color';
@@ -33,14 +33,17 @@ export interface IMinimumHeights {
 	landscape: number;
 }
 
-export class CollapsingHeader extends GridLayout implements AddChildFromBuilder {
+export class CollapsingHeader extends GridLayout  {
+	public header: Header;
+	public content: Content;
+
 	private _childLayouts: View[];
 	private _topOpacity: number;
 	private _loaded: boolean;
 	private _minimumHeights: IMinimumHeights;
 	private _statusBarBackgroundColor: string;
 
-	get statusIosBarBackgroundColor(): string{
+	get statusIosBarBackgroundColor(): string {
 		return this._statusBarBackgroundColor;
 	}
 
@@ -87,6 +90,16 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 		this.on(GridLayout.loadedEvent, (data: any) => {
 			//prevents re adding views on resume in android.
 			if (!this._loaded) {
+
+				//if the childlayouts isnt' set.
+				if (this._childLayouts.length == 0) {
+					//itterate through and set child layous
+					this.eachLayoutChild((view: View, isLast: boolean) => {
+						this._unregisterLayoutChild(view);
+						this._childLayouts.push(view);
+					});
+				}
+
 				this._loaded = true;
 				this.addRow(row);
 				this.addColumn(column);
@@ -113,12 +126,15 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 
 				this._childLayouts.forEach(element => {
 					if (element instanceof Content) {
+						this.removeChild(element); //rmoves the elment from the parent for manipulation
 						wrapperStackLayout.addChild(element);
 						contentView = element;
 					}
 				});
 				this._childLayouts.forEach(element => {
 					if (element instanceof Header) {
+						this.removeChild(element);
+
 						headerView.addChild(element);
 						if ((<Header>element).dropShadow) {
 							headerView.height = element.height;
@@ -251,10 +267,4 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 			}
 		});
 	}
-
-	_addChildFromBuilder = (name: string, value: any) => {
-		if (value instanceof View) {
-			this._childLayouts.push(value);
-		}
-	};
 }
