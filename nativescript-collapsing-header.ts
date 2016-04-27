@@ -7,9 +7,7 @@ import {View, AddChildFromBuilder} from 'ui/core/view';
 import {Label} from 'ui/label';
 import {StackLayout} from 'ui/layouts/stack-layout';
 import {Color} from 'color';
-import {CollapsingHeaderUtilities} from './collapsing-header-utilities';
-
-export class Utilities extends CollapsingHeaderUtilities { }
+import * as utilities from './utilities';
 
 export class Header extends StackLayout {
 	private _dropShadow: boolean;
@@ -79,9 +77,8 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 		let row = new ItemSpec(3, GridUnitType.star);
 		let column = new ItemSpec(1, GridUnitType.star);
 		let invalidSetup = false;
-		let Utilities = new CollapsingHeaderUtilities();
 
-		this._minimumHeights = Utilities.getMinimumHeights();
+		this._minimumHeights = utilities.getMinimumHeights();
 		if (this.statusIosBarBackgroundColor == null) {
 			this.statusIosBarBackgroundColor = '#fff';
 		}
@@ -117,7 +114,7 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 				//creates a new stack layout to wrap the content inside of the plugin.
 				let wrapperStackLayout = new StackLayout();
 				scrollView.content = wrapperStackLayout;
-				Utilities.disableBounce(scrollView);
+				utilities.disableBounce(scrollView);
 
 				this._childLayouts.forEach(element => {
 					if (element instanceof Content) {
@@ -130,7 +127,7 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 						headerView.addChild(element);
 						if ((<Header>element).dropShadow) {
 							headerView.height = element.height;
-							headerView.addChild(Utilities.addDropShadow(element.height, element.width));
+							headerView.addChild(utilities.addDropShadow(element.height, element.width));
 						} else {
 							headerView.height = element.height;
 						}
@@ -138,13 +135,13 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 					}
 				});
 
-				Utilities.validateView(this, headerView, contentView);
+				utilities.validateView(this, headerView, contentView);
 
 				headerView.marginTop = 0;
 				wrapperStackLayout.paddingTop = headerView.height;
 				wrapperStackLayout.marginTop = 0;
 
-				Utilities.addScrollEvent(scrollView, headerView);
+				utilities.addScrollEvent(scrollView, headerView);
 
 			}
 		});

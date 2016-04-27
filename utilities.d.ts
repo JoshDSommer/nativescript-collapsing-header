@@ -1,0 +1,14 @@
+import { ScrollView } from 'ui/scroll-view';
+import { GridLayout } from 'ui/layouts/grid-layout';
+import { AbsoluteLayout } from 'ui/layouts/absolute-layout';
+import { View } from 'ui/core/view';
+import { StackLayout } from 'ui/layouts/stack-layout';
+import { Content, IMinimumHeights } from './nativescript-collapsing-header';
+export declare function disableBounce(scrollView: ScrollView): void;
+export declare function validateView(parent: GridLayout, headerView: AbsoluteLayout, contentView: Content): void;
+export declare function addScrollEvent(scrollView: ScrollView, headerView: AbsoluteLayout): void;
+export declare function setMinimumHeight(contentView: Content, minHeight: number): void;
+export declare function getMinimumHeights(): IMinimumHeights;
+export declare function addDropShadow(marginTop: number, width: number): StackLayout;
+export declare function shadowView(opacity: number, width: number): StackLayout;
+export declare function displayDevWarning(parent: GridLayout, message: string, ...viewsToCollapse: View[]): void;

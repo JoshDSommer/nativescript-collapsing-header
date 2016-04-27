@@ -1,9 +1,6 @@
 import { GridLayout } from 'ui/layouts/grid-layout';
 import { AddChildFromBuilder } from 'ui/core/view';
 import { StackLayout } from 'ui/layouts/stack-layout';
-import { CollapsingHeaderUtilities } from './collapsing-header-utilities';
-export declare class Utilities extends CollapsingHeaderUtilities {
-}
 export declare class Header extends StackLayout {
     private _dropShadow;
     dropShadow: boolean;
