@@ -7,7 +7,8 @@ import {View, AddChildFromBuilder} from 'ui/core/view';
 import {Label} from 'ui/label';
 import {StackLayout} from 'ui/layouts/stack-layout';
 import {Color} from 'color';
-import * as utilities from './utilities';
+import {ListView} from 'ui/list-view';
+import {CollapsingUtilities as utilities} from './utilities';
 
 export class Header extends StackLayout {
 	private _dropShadow: boolean;
@@ -28,6 +29,7 @@ export class Header extends StackLayout {
 export class Content extends StackLayout {
 
 }
+
 
 export interface IMinimumHeights {
 	portrait: number;
@@ -67,7 +69,7 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 
 	private constructView(): void {
 		this._childLayouts = [];
-		let contentView: Content;
+		let contentView: Content | ListView;
 		let scrollView: ScrollView = new ScrollView();
 		let viewsToFade: View[];
 		let maxTopViewHeight: number;
@@ -95,14 +97,14 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 				this._loaded = true;
 				this.addRow(row);
 				this.addColumn(column);
-				this.addChild(scrollView);
+				let wrapperStackLayout = new StackLayout();
+				wrapperStackLayout.verticalAlignment = 'top';
+
 				this.addChild(headerView);
 				this.addChild(statusBarBackground);
 
-				GridLayout.setRow(scrollView, 2);
 				GridLayout.setRow(headerView, 1);
 				GridLayout.setRow(statusBarBackground, 0);
-				GridLayout.setColumn(scrollView, 2);
 				GridLayout.setColumn(headerView, 1);
 				GridLayout.setColumn(statusBarBackground, 0);
 
@@ -112,13 +114,10 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 				statusBarBackground.verticalAlignment = 'top';
 				statusBarBackground.marginTop = -25;
 				//creates a new stack layout to wrap the content inside of the plugin.
-				let wrapperStackLayout = new StackLayout();
-				scrollView.content = wrapperStackLayout;
-				utilities.disableBounce(scrollView);
+
 
 				this._childLayouts.forEach(element => {
-					if (element instanceof Content) {
-						wrapperStackLayout.addChild(element);
+					if (element instanceof Content || element instanceof ListView) {
 						contentView = element;
 					}
 				});
@@ -135,13 +134,36 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 					}
 				});
 
+
+
 				utilities.validateView(this, headerView, contentView);
 
 				headerView.marginTop = 0;
 				wrapperStackLayout.paddingTop = headerView.height;
 				wrapperStackLayout.marginTop = 0;
 
-				utilities.addScrollEvent(scrollView, headerView);
+				if (contentView instanceof Content) {
+					wrapperStackLayout.addChild(contentView);
+					this.addChild(scrollView);
+					GridLayout.setRow(scrollView, 2);
+					GridLayout.setColumn(scrollView, 2);
+					scrollView.content = wrapperStackLayout;
+					utilities.disableBounce(scrollView);
+
+					utilities.addScrollEvent(scrollView, headerView);
+				} else {
+
+					wrapperStackLayout.addChild(contentView);
+					contentView.verticalAlignment = 'top';
+
+					utilities.disableBounce(contentView);
+
+					this.addChild(wrapperStackLayout);
+					GridLayout.setRow(wrapperStackLayout, 2);
+					GridLayout.setColumn(wrapperStackLayout, 0);
+
+					utilities.addListScrollEvent(contentView, headerView);
+				}
 
 			}
 		});

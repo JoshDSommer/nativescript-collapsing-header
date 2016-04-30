@@ -2,13 +2,19 @@ import { ScrollView } from 'ui/scroll-view';
 import { GridLayout } from 'ui/layouts/grid-layout';
 import { AbsoluteLayout } from 'ui/layouts/absolute-layout';
 import { View } from 'ui/core/view';
+import { ListView } from 'ui/list-view';
 import { StackLayout } from 'ui/layouts/stack-layout';
 import { Content, IMinimumHeights } from './nativescript-collapsing-header';
-export declare function disableBounce(scrollView: ScrollView): void;
-export declare function validateView(parent: GridLayout, headerView: AbsoluteLayout, contentView: Content): void;
-export declare function addScrollEvent(scrollView: ScrollView, headerView: AbsoluteLayout): void;
-export declare function setMinimumHeight(contentView: Content, minHeight: number): void;
-export declare function getMinimumHeights(): IMinimumHeights;
-export declare function addDropShadow(marginTop: number, width: number): StackLayout;
-export declare function shadowView(opacity: number, width: number): StackLayout;
-export declare function displayDevWarning(parent: GridLayout, message: string, ...viewsToCollapse: View[]): void;
+export declare class CollapsingUtilities {
+    static disableBounce(view: ScrollView | ListView): void;
+    static validateView(parent: GridLayout, headerView: AbsoluteLayout, contentView: Content | ListView): void;
+    private static animateHideHeader();
+    private static animateShowHeader();
+    static addListScrollEvent(listView: ListView, headerView: AbsoluteLayout): void;
+    static addScrollEvent(scrollView: ScrollView, headerView: AbsoluteLayout): void;
+    static setMinimumHeight(contentView: Content, minHeight: number): void;
+    static getMinimumHeights(): IMinimumHeights;
+    static addDropShadow(marginTop: number, width: number): StackLayout;
+    private static shadowView(opacity, width);
+    static displayDevWarning(parent: GridLayout, message: string, ...viewsToCollapse: View[]): void;
+}
