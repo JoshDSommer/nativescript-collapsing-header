@@ -8,8 +8,6 @@ import { Content, IMinimumHeights } from './nativescript-collapsing-header';
 export declare class CollapsingUtilities {
     static disableBounce(view: ScrollView | ListView): void;
     static validateView(parent: GridLayout, headerView: AbsoluteLayout, contentView: Content | ListView): void;
-    private static animateHideHeader();
-    private static animateShowHeader();
     static addListScrollEvent(listView: ListView, headerView: AbsoluteLayout): void;
     static addScrollEvent(scrollView: ScrollView, headerView: AbsoluteLayout): void;
     static setMinimumHeight(contentView: Content, minHeight: number): void;

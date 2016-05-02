@@ -9,7 +9,8 @@
     },
     "files": [
       "demo/node_modules/tns-core-modules/tns-core-modules.d.ts",
-      "nativescript-collapsing-header.ts"
+      "nativescript-collapsing-header.ts",
+      "android17.d.ts"
     ],
     "compileOnSave": false
 }

@@ -38,55 +38,88 @@ export class CollapsingUtilities {
 		}
 	}
 
-	private static animateHideHeader() {
-
-	}
-	private static animateShowHeader() {
-
-	}
 	public static addListScrollEvent(listView: ListView, headerView: AbsoluteLayout) {
 		if (app.android) {
-			// let androidListView = <android.widget.ListView>listView.android;
-			// androidListView.setOnScrollListener(new android.widget.AbsListView.OnScrollListener(){
-			// });
-			listView.on('swipe', (args: SwipeGestureEventData) => {
-				console.log('swiping...')
-				if (args.direction === SwipeDirection.up && listView.marginTop == 0) {
-					// listView.animate({
-					// 	scale: { x: 2, y: 2 },
-					// 	duration: 3000
-					// });
-					listView.marginTop = headerView.height * -1;
-					headerView.marginTop = headerView.height * -1;
-				} else {
-					listView.marginTop = 0;
-					headerView.marginTop = 0;
+			//listView.height = listView.height + headerView.height;
+
+			const animateHideHeader = (headerHidden: boolean, headerView: AbsoluteLayout, listView: ListView): boolean => {
+				if (headerHidden === false) {
+					headerView.animate({
+						translate: { x: 0, y: (headerView.height * -1) },
+						duration: 700,
+					});
+					listView.animate({
+						translate: { x: 0, y: (headerView.height * -1) },
+						duration: 700,
+					});
+					headerHidden = true;
 				}
-			});
-		} else if(app.ios) {
+				return headerHidden;
+			};
+			const animateShowHeader = (headerHidden: boolean, headerView: AbsoluteLayout, listView: ListView): boolean => {
+				if (headerHidden === true) {
+					headerView.animate({
+						translate: { x: 0, y: 0 },
+						duration: 400,
+					});
+					listView.animate({
+						translate: { x: 0, y: 0 },
+						duration: 400,
+					});
+					headerHidden = false;
+				}
+				return headerHidden;
+			};
+
+			let headerHidden: boolean = false;
+			let mLastFirstVisibleItem: number;
+			listView.height = <any>'100%';
+			listView.android.setOnScrollListener(new android.widget.AbsListView.OnScrollListener(<android.widget.AbsListView.IOnScrollListener>{
+
+				onScrollStateChanged: function (view: android.widget.AbsListView, scrollState: number) {
+
+				},
+				onScroll: function (view: android.widget.AbsListView, firstVisibleItem: number, visibleItemCount: number, totalItemCount: number) {
+					if (mLastFirstVisibleItem < firstVisibleItem) {
+						console.log("SCROLLING DOWN " + firstVisibleItem);
+						headerHidden = animateHideHeader(headerHidden, headerView, listView);
+					}
+					if (mLastFirstVisibleItem > firstVisibleItem) {
+						console.log("SCROLLING UP" + firstVisibleItem);
+						headerHidden = animateShowHeader(headerHidden, headerView, listView);
+
+						if (firstVisibleItem === 0) {
+							listView.marginTop = headerView.height;
+							console.log(listView.marginTop + " should be " + headerView.height)
+						}
+					}
+					mLastFirstVisibleItem = firstVisibleItem;
+				}
+			}));
+		} else if (app.ios) {
 			listView.on('pan', (args: PanGestureEventData) => {
 				console.log('swiping...');
 				console.log(args.deltaY);
 				let marginTop = 0;
 				if (args.deltaY < 0) {
-					marginTop = args.deltaY;
-					if (marginTop < (headerView.height * -1)) {
-						marginTop = (headerView.height * -1);
-					}
+					// marginTop = args.deltaY;
+					// if (marginTop < (headerView.height * -1)) {
+					// 	marginTop = (headerView.height * -1);
+					// }
 				} else {
 					// if (baseOffset < 0) {
 					// 	marginTop = (baseOffset - args.deltaY * -1);
-					// } else {
-					marginTop = headerView.marginTop;
-					marginTop = marginTop + args.deltaY;
+					// // } else {
+					// marginTop = headerView.marginTop;
+					// marginTop = marginTop + args.deltaY;
+					// // }
+					// if (marginTop > 0) {
+					// 	marginTop = 0;
 					// }
-					if (marginTop > 0) {
-						marginTop = 0;
-					}
 				}
-				console.log('margin top : ' + marginTop);
-				headerView.marginTop = marginTop;
-				listView.marginTop = headerView.marginTop;
+				// console.log('margin top : ' + marginTop);
+				// headerView.marginTop = marginTop;
+				// listView.marginTop = headerView.marginTop;
 			});
 		}
 	}

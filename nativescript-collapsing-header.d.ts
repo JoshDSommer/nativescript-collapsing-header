@@ -1,12 +1,15 @@
 import { GridLayout } from 'ui/layouts/grid-layout';
 import { AddChildFromBuilder } from 'ui/core/view';
 import { StackLayout } from 'ui/layouts/stack-layout';
+import { ListView } from 'ui/list-view';
 export declare class Header extends StackLayout {
     private _dropShadow;
     dropShadow: boolean;
     constructor();
 }
 export declare class Content extends StackLayout {
+}
+export declare class ListViewContent extends ListView {
 }
 export interface IMinimumHeights {
     portrait: number;

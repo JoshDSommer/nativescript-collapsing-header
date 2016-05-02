@@ -29,6 +29,9 @@ export class Header extends StackLayout {
 export class Content extends StackLayout {
 
 }
+export class ListViewContent extends ListView {
+
+}
 
 
 export interface IMinimumHeights {
@@ -45,6 +48,8 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 	private _loaded: boolean;
 	private _minimumHeights: IMinimumHeights;
 	private _statusBarBackgroundColor: string;
+
+
 
 	get statusIosBarBackgroundColor(): string {
 		return this._statusBarBackgroundColor;
@@ -139,10 +144,10 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 				utilities.validateView(this, headerView, contentView);
 
 				headerView.marginTop = 0;
-				wrapperStackLayout.paddingTop = headerView.height;
 				wrapperStackLayout.marginTop = 0;
 
 				if (contentView instanceof Content) {
+					wrapperStackLayout.paddingTop = headerView.height;
 					wrapperStackLayout.addChild(contentView);
 					this.addChild(scrollView);
 					GridLayout.setRow(scrollView, 2);
@@ -155,6 +160,7 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 
 					wrapperStackLayout.addChild(contentView);
 					contentView.verticalAlignment = 'top';
+					contentView.marginTop = headerView.height;
 
 					utilities.disableBounce(contentView);
 
