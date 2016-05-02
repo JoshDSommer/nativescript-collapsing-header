@@ -120,7 +120,6 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 				statusBarBackground.marginTop = -25;
 				//creates a new stack layout to wrap the content inside of the plugin.
 
-
 				this._childLayouts.forEach(element => {
 					if (element instanceof Content || element instanceof ListView) {
 						contentView = element;
@@ -139,8 +138,6 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 					}
 				});
 
-
-
 				utilities.validateView(this, headerView, contentView);
 
 				headerView.marginTop = 0;
@@ -157,7 +154,6 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 
 					utilities.addScrollEvent(scrollView, headerView);
 				} else {
-
 					wrapperStackLayout.addChild(contentView);
 					contentView.verticalAlignment = 'top';
 					contentView.marginTop = headerView.height;

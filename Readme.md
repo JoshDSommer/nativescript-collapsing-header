@@ -51,6 +51,31 @@ when using the collapsing header plugin you need at least two layout views insid
 
 The ``<collapsingHeader:Header>`` has a property called `dropShadow` if set to true it will create a small drop shadow effect on the bottom of the header.
 
+##ListView support.
+As of version 1.4.0 list view support has been added. Instead of a ``<collapsingHeader:Content>`` elment, add a ``<ListView>`` like you would normally, see below for and example.
+
+```xml
+<Page xmlns="http://schemas.nativescript.org/tns.xsd"
+	 xmlns:collapsingHeader="nativescript-collapsing-header"
+	loaded="pageLoaded">
+  	<collapsingHeader:CollapsingHeader>
+		<collapsingHeader:Header class="header-template">
+			<Label id="headerLabel" text="Collapsing Header"></Label>
+		</collapsingHeader:Header>
+		<ListView id="songList" items="{{items}}"  separatorColor="#333">
+			<ListView.itemTemplate>
+			<GridLayout columns="auto, *, auto" rows="auto"  class="list-item">
+				<StackLayout row="0" col="1">
+				<Label text="{{title}}" textWrap="true" class="title"></Label>
+				<Label text="{{artist}}" textWrap="true" class="title-sub"></Label>
+				</StackLayout>
+			</GridLayout>
+			</ListView.itemTemplate>
+		</ListView>
+	</collapsingHeader:CollapsingHeader>
+</Page>
+```
+
 ## iOS Only
 to change the status bar color you there is a property for the ``<collapsingHeader:CollapsingHeader>`` element called `statusIosBarBackgroundColor` if not it defaults to white.
 
