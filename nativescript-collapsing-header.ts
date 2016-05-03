@@ -102,7 +102,6 @@ export class CollapsingHeader extends AbsoluteLayout implements AddChildFromBuil
 				scrollView.width = <any>'100%';
 				scrollView.height = <any>'100%';
 				wrapperStackLayout.width = <any>'100%';
-				//wrapperStackLayout.height = <any>'100%';
 
 				this.addChild(scrollView);
 				this.addChild(headerView);
@@ -153,6 +152,8 @@ export class CollapsingHeader extends AbsoluteLayout implements AddChildFromBuil
 
 					utilities.addScrollEvent(scrollView, headerView);
 				} else {
+					wrapperStackLayout.height = <any>'100%';
+
 					wrapperStackLayout.addChild(contentView);
 					contentView.verticalAlignment = 'top';
 					contentView.marginTop = headerView.height;

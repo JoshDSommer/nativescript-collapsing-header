@@ -52,7 +52,7 @@ when using the collapsing header plugin you need at least two layout views insid
 The ``<collapsingHeader:Header>`` has a property called `dropShadow` if set to true it will create a small drop shadow effect on the bottom of the header.
 
 ##{N} ListView support.
-As of version 1.4.0 list view support has been added. Instead of a ``<collapsingHeader:Content>`` elment, add a ``<ListView>`` like you would normally, see below for and example.
+As of version 2.0.0 list view support has been added. Instead of a ``<collapsingHeader:Content>`` elment, add a ``<ListView>`` like you would normally, see below for and example.
 
 ```xml
 <Page xmlns="http://schemas.nativescript.org/tns.xsd"
@@ -96,3 +96,5 @@ https://github.com/NathanWalker/nativescript-plugin-seed
 ##License
 
 [MIT](/LICENSE)
+
+for {N} version 1.7.0+
