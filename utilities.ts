@@ -19,10 +19,13 @@ export class CollapsingUtilities {
 				translate: { x: 0, y: (headerView.height * -1) },
 				duration: 500,
 			});
-			content.animate({
-				translate: { x: 0, y: (headerView.height * -1) },
-				duration: 500,
-			});
+			if (content instanceof ListView) {
+				content.animate({
+					translate: { x: 0, y: (headerView.height * -1) },
+					duration: 500,
+				});
+			}
+
 			headerHidden = true;
 		}
 		return headerHidden;
@@ -33,10 +36,12 @@ export class CollapsingUtilities {
 				translate: { x: 0, y: 0 },
 				duration: 400,
 			});
-			content.animate({
-				translate: { x: 0, y: 0 },
-				duration: 400,
-			});
+			if (content instanceof ListView) {
+				content.animate({
+					translate: { x: 0, y: 0 },
+					duration: 400,
+				});
+			}
 			headerHidden = false;
 		}
 		return headerHidden;
@@ -65,7 +70,7 @@ export class CollapsingUtilities {
 		}
 	}
 
-	public static addListScrollEvent(listView: ListView, headerView: AbsoluteLayout | StackLayout) {
+	public static addListScrollEvent(listView: ListView, headerView: StackLayout) {
 		let headerHidden: boolean = false;
 		const animateHideHeader = this.animateHideHeader;
 		const animateShowHeader = this.animateShowHeader;
@@ -102,18 +107,20 @@ export class CollapsingUtilities {
 		}
 	}
 
-	public static addScrollEvent(scrollView: ScrollView, headerView: AbsoluteLayout) {
+	public static addScrollEvent(scrollView: ScrollView, headerView: StackLayout) {
 		let prevOffset = -10;
 		let headerHidden: boolean = false;
 		const animateHideHeader = this.animateHideHeader;
 		const animateShowHeader = this.animateShowHeader;
+		let wrapperStackLayout = <StackLayout>scrollView.content;
 		scrollView.on(ScrollView.scrollEvent, (args: ScrollEventData) => {
+			console.log(scrollView.verticalOffset);
 			if (prevOffset <= scrollView.verticalOffset) {
-
 				headerHidden = animateHideHeader(headerHidden, headerView, scrollView);
-
+				wrapperStackLayout.paddingTop = 0;
 			} else {
 				headerHidden = animateShowHeader(headerHidden, headerView, scrollView);
+				wrapperStackLayout.paddingTop = headerView.height;
 			}
 			prevOffset = scrollView.verticalOffset;
 		});

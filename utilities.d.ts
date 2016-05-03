@@ -9,8 +9,8 @@ export declare class CollapsingUtilities {
     private static animateShowHeader(headerHidden, headerView, content);
     static disableBounce(view: ScrollView | ListView): void;
     static validateView(parent: AbsoluteLayout, headerView: AbsoluteLayout, contentView: Content | ListView): void;
-    static addListScrollEvent(listView: ListView, headerView: AbsoluteLayout | StackLayout): void;
-    static addScrollEvent(scrollView: ScrollView, headerView: AbsoluteLayout): void;
+    static addListScrollEvent(listView: ListView, headerView: StackLayout): void;
+    static addScrollEvent(scrollView: ScrollView, headerView: StackLayout): void;
     static setMinimumHeight(contentView: Content, minHeight: number): void;
     static getMinimumHeights(): IMinimumHeights;
     static addDropShadow(marginTop: number, width: number): StackLayout;

@@ -1,6 +1,6 @@
 {
 	"name": "nativescript-collapsing-header",
-	"version": "1.4.0",
+	"version": "2.0.0",
 	"description": "NativeScript Collapsing Header Plugin.",
 	"main": "nativescript-collapsing-header.js",
 	"nativescript": {
