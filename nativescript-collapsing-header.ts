@@ -1,7 +1,6 @@
 import * as app from 'application';
 import * as Platform from 'platform';
 import {ScrollView, ScrollEventData} from 'ui/scroll-view';
-import {GridLayout, ItemSpec, GridUnitType} from 'ui/layouts/grid-layout';
 import {AbsoluteLayout} from 'ui/layouts/absolute-layout';
 import {View, AddChildFromBuilder} from 'ui/core/view';
 import {Label} from 'ui/label';
@@ -39,7 +38,7 @@ export interface IMinimumHeights {
 	landscape: number;
 }
 
-export class CollapsingHeader extends GridLayout implements AddChildFromBuilder {
+export class CollapsingHeader extends AbsoluteLayout implements AddChildFromBuilder {
 	public header: Header;
 	public content: Content;
 
@@ -48,8 +47,6 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 	private _loaded: boolean;
 	private _minimumHeights: IMinimumHeights;
 	private _statusBarBackgroundColor: string;
-
-
 
 	get statusIosBarBackgroundColor(): string {
 		return this._statusBarBackgroundColor;
@@ -79,10 +76,8 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 		let viewsToFade: View[];
 		let maxTopViewHeight: number;
 		let controlsToFade: string[];
-		let headerView: AbsoluteLayout = new AbsoluteLayout();
-		let statusBarBackground: AbsoluteLayout = new AbsoluteLayout();
-		let row = new ItemSpec(3, GridUnitType.star);
-		let column = new ItemSpec(1, GridUnitType.star);
+		let headerView: StackLayout = new StackLayout();
+		let statusBarBackground: StackLayout = new StackLayout();
 		let invalidSetup = false;
 
 		this._minimumHeights = utilities.getMinimumHeights();
@@ -96,28 +91,29 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 		this._topOpacity = 1;
 		this._loaded = false;
 
-		this.on(GridLayout.loadedEvent, (data: any) => {
+		this.on(AbsoluteLayout.loadedEvent, (data: any) => {
 			//prevents re adding views on resume in android.
 			if (!this._loaded) {
 				this._loaded = true;
-				this.addRow(row);
-				this.addColumn(column);
+
 				let wrapperStackLayout = new StackLayout();
 				wrapperStackLayout.verticalAlignment = 'top';
 
+				scrollView.width = <any>'100%';
+				scrollView.height = <any>'100%';
+				wrapperStackLayout.width = <any>'100%';
+				wrapperStackLayout.height = <any>'100%';
+
+				this.addChild(scrollView);
 				this.addChild(headerView);
+				this.addChild(wrapperStackLayout);
 				this.addChild(statusBarBackground);
 
-				GridLayout.setRow(headerView, 1);
-				GridLayout.setRow(statusBarBackground, 0);
-				GridLayout.setColumn(headerView, 1);
-				GridLayout.setColumn(statusBarBackground, 0);
-
 				statusBarBackground.height = 25;
-				statusBarBackground.width = this._minimumHeights.portrait;
 				statusBarBackground.backgroundColor = new Color(this.statusIosBarBackgroundColor);
 				statusBarBackground.verticalAlignment = 'top';
-				statusBarBackground.marginTop = -25;
+				statusBarBackground.width = <any>'100%';
+				AbsoluteLayout.setTop(statusBarBackground, -25);
 				//creates a new stack layout to wrap the content inside of the plugin.
 
 				this._childLayouts.forEach(element => {
@@ -126,15 +122,17 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 					}
 				});
 				this._childLayouts.forEach(element => {
-					if (element instanceof Header) {
+					if (element instanceof Header || element.className === 'header-template') {
 						headerView.addChild(element);
-						if ((<Header>element).dropShadow) {
+						if (element instanceof Header && (<Header>element).dropShadow) {
 							headerView.height = element.height;
 							headerView.addChild(utilities.addDropShadow(element.height, element.width));
 						} else {
 							headerView.height = element.height;
 						}
 						element.verticalAlignment = 'top';
+						headerView.width = <any>'100%';
+						element.width = <any>'100%';
 					}
 				});
 
@@ -144,11 +142,11 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 				wrapperStackLayout.marginTop = 0;
 
 				if (contentView instanceof Content) {
-					wrapperStackLayout.paddingTop = headerView.height;
+					this.removeChild(wrapperStackLayout);
+
+					AbsoluteLayout.setTop(scrollView, headerView.height);
 					wrapperStackLayout.addChild(contentView);
-					this.addChild(scrollView);
-					GridLayout.setRow(scrollView, 2);
-					GridLayout.setColumn(scrollView, 2);
+
 					scrollView.content = wrapperStackLayout;
 					utilities.disableBounce(scrollView);
 
@@ -160,13 +158,8 @@ export class CollapsingHeader extends GridLayout implements AddChildFromBuilder 
 
 					utilities.disableBounce(contentView);
 
-					this.addChild(wrapperStackLayout);
-					GridLayout.setRow(wrapperStackLayout, 2);
-					GridLayout.setColumn(wrapperStackLayout, 0);
-
 					utilities.addListScrollEvent(contentView, headerView);
 				}
-
 			}
 		});
 	}

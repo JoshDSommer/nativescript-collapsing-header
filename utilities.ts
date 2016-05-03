@@ -1,7 +1,6 @@
 import * as app from 'application';
 import * as Platform from 'platform';
 import {ScrollView, ScrollEventData} from 'ui/scroll-view';
-import {GridLayout, ItemSpec, GridUnitType} from 'ui/layouts/grid-layout';
 import {AbsoluteLayout} from 'ui/layouts/absolute-layout';
 import {View, AddChildFromBuilder} from 'ui/core/view';
 import {Label} from 'ui/label';
@@ -14,6 +13,35 @@ import { SwipeDirection, GestureEventData, SwipeGestureEventData, PanGestureEven
 
 export class CollapsingUtilities {
 
+	private static animateHideHeader(headerHidden: boolean, headerView: AbsoluteLayout, content: ListView | ScrollView): boolean {
+		if (headerHidden === false) {
+			headerView.animate({
+				translate: { x: 0, y: (headerView.height * -1) },
+				duration: 500,
+			});
+			content.animate({
+				translate: { x: 0, y: (headerView.height * -1) },
+				duration: 500,
+			});
+			headerHidden = true;
+		}
+		return headerHidden;
+	};
+	private static animateShowHeader(headerHidden: boolean, headerView: AbsoluteLayout, content: ListView | ScrollView): boolean {
+		if (headerHidden === true) {
+			headerView.animate({
+				translate: { x: 0, y: 0 },
+				duration: 400,
+			});
+			content.animate({
+				translate: { x: 0, y: 0 },
+				duration: 400,
+			});
+			headerHidden = false;
+		}
+		return headerHidden;
+	};
+
 	public static disableBounce(view: ScrollView | ListView): void {
 		//no ui bounce. causes problems
 		if (app.ios) {
@@ -23,7 +51,7 @@ export class CollapsingUtilities {
 		}
 	}
 
-	public static validateView(parent: GridLayout, headerView: AbsoluteLayout, contentView: Content | ListView): void {
+	public static validateView(parent: AbsoluteLayout, headerView: AbsoluteLayout, contentView: Content | ListView): void {
 		if (headerView == null || contentView == null) {
 			this.displayDevWarning(parent, 'ScrollView Setup Invalid. You must have Header and Content tags',
 				headerView,
@@ -37,36 +65,11 @@ export class CollapsingUtilities {
 		}
 	}
 
-	public static addListScrollEvent(listView: ListView, headerView: AbsoluteLayout) {
+	public static addListScrollEvent(listView: ListView, headerView: AbsoluteLayout | StackLayout) {
 		let headerHidden: boolean = false;
-		const animateHideHeader = (headerHidden: boolean, headerView: AbsoluteLayout, listView: ListView): boolean => {
-			if (headerHidden === false) {
-				headerView.animate({
-					translate: { x: 0, y: (headerView.height * -1) },
-					duration: 700,
-				});
-				listView.animate({
-					translate: { x: 0, y: (headerView.height * -1) },
-					duration: 700,
-				});
-				headerHidden = true;
-			}
-			return headerHidden;
-		};
-		const animateShowHeader = (headerHidden: boolean, headerView: AbsoluteLayout, listView: ListView): boolean => {
-			if (headerHidden === true) {
-				headerView.animate({
-					translate: { x: 0, y: 0 },
-					duration: 400,
-				});
-				listView.animate({
-					translate: { x: 0, y: 0 },
-					duration: 400,
-				});
-				headerHidden = false;
-			}
-			return headerHidden;
-		};
+		const animateHideHeader = this.animateHideHeader;
+		const animateShowHeader = this.animateShowHeader;
+
 		listView.height = <any>'100%';
 
 		if (app.android) {
@@ -101,31 +104,16 @@ export class CollapsingUtilities {
 
 	public static addScrollEvent(scrollView: ScrollView, headerView: AbsoluteLayout) {
 		let prevOffset = -10;
-		let baseOffset = 0;
+		let headerHidden: boolean = false;
+		const animateHideHeader = this.animateHideHeader;
+		const animateShowHeader = this.animateShowHeader;
 		scrollView.on(ScrollView.scrollEvent, (args: ScrollEventData) => {
-			//leaving in the up/down detection as it may be handy in the future.
 			if (prevOffset <= scrollView.verticalOffset) {
-				//when scrolling down
-				if (baseOffset > scrollView.verticalOffset) {
-					baseOffset = scrollView.verticalOffset;
-				}
-				headerView.marginTop = baseOffset - scrollView.verticalOffset;
-				if (headerView.marginTop < (headerView.height * -1)) {
-					headerView.marginTop = (headerView.height * -1);
-				}
+
+				headerHidden = animateHideHeader(headerHidden, headerView, scrollView);
+
 			} else {
-				//scrolling up,
-				if (baseOffset < scrollView.verticalOffset) {
-					baseOffset = scrollView.verticalOffset;
-				}
-				headerView.marginTop = headerView.marginTop + 3;
-				if (headerView.marginTop > 0) {
-					headerView.marginTop = 0;
-				}
-			}
-			//this accounts for a fast scroll that reaches the top with the header partially shown.
-			if (scrollView.verticalOffset === 0) {
-				headerView.marginTop = 0;
+				headerHidden = animateShowHeader(headerHidden, headerView, scrollView);
 			}
 			prevOffset = scrollView.verticalOffset;
 		});
@@ -171,7 +159,7 @@ export class CollapsingUtilities {
 		return shadowRow;
 	}
 
-	public static displayDevWarning(parent: GridLayout, message: string, ...viewsToCollapse: View[]): void {
+	public static displayDevWarning(parent: AbsoluteLayout, message: string, ...viewsToCollapse: View[]): void {
 		let warningText = new Label();
 		warningText.text = message;
 		warningText.color = new Color('red');

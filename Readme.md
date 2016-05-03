@@ -51,7 +51,7 @@ when using the collapsing header plugin you need at least two layout views insid
 
 The ``<collapsingHeader:Header>`` has a property called `dropShadow` if set to true it will create a small drop shadow effect on the bottom of the header.
 
-##ListView support.
+##{N} ListView support.
 As of version 1.4.0 list view support has been added. Instead of a ``<collapsingHeader:Content>`` elment, add a ``<ListView>`` like you would normally, see below for and example.
 
 ```xml
@@ -78,6 +78,7 @@ As of version 1.4.0 list view support has been added. Instead of a ``<collapsing
 
 ## iOS Only
 to change the status bar color you there is a property for the ``<collapsingHeader:CollapsingHeader>`` element called `statusIosBarBackgroundColor` if not it defaults to white.
+
 
 ###Plugin Development Work Flow.
 

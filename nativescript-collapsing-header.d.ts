@@ -1,4 +1,4 @@
-import { GridLayout } from 'ui/layouts/grid-layout';
+import { AbsoluteLayout } from 'ui/layouts/absolute-layout';
 import { AddChildFromBuilder } from 'ui/core/view';
 import { StackLayout } from 'ui/layouts/stack-layout';
 import { ListView } from 'ui/list-view';
@@ -15,7 +15,7 @@ export interface IMinimumHeights {
     portrait: number;
     landscape: number;
 }
-export declare class CollapsingHeader extends GridLayout implements AddChildFromBuilder {
+export declare class CollapsingHeader extends AbsoluteLayout implements AddChildFromBuilder {
     header: Header;
     content: Content;
     private _childLayouts;
